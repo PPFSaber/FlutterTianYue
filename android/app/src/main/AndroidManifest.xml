@@ -36,12 +36,16 @@
          FlutterApplication and put your custom class here.
     -->
     <application
-        android:name="com.zhudong.tianyue.MainApplication"
+        android:name="${applicationName}"
         android:label="天天动漫"
         android:icon="@mipmap/icon_z_comic">
 
         <meta-data android:name="com.amap.api.v2.apikey"
             android:value="bd33c8de9c7ed95768fca203ffa92937"/>
+
+        <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
+            <item name="android:windowBackground">@drawable/[your_normal_background_drawable]</item>
+        </style>
 
         <activity
             android:name=".MainActivity"
@@ -57,10 +61,25 @@
                  there is no splash screen (such as the default splash screen
                  defined in @style/LaunchTheme).
             -->
-            <meta-data
-                android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
-                android:value="true" />
 
+            <!-- Specify that the launch screen should continue being displayed -->
+            <!-- until Flutter renders its first frame. -->
+            <meta-data
+                    android:name="io.flutter.embedding.android.SplashScreenDrawable"
+                    android:resource="@drawable/launch_background" />
+
+            <!-- Theme to apply as soon as Flutter begins rendering frames -->
+            <meta-data
+                    android:name="io.flutter.embedding.android.NormalTheme"
+                    android:resource="@style/NormalTheme"
+            />
+
+            <meta-data
+                    android:name="flutterEmbedding"
+                    android:value="2" />
+            <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
+                <item name="android:windowBackground">@drawable/[your_normal_background_drawable]</item>
+            </style>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

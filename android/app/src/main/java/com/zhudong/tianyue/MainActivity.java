@@ -6,23 +6,24 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.os.Bundle;
+
 import android.util.Log;
 
 import com.amap.api.maps2d.MapView;
 
 import java.util.concurrent.TimeUnit;
 
-import io.flutter.app.FlutterActivity;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugins.GeneratedPluginRegistrant;
+
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
+import io.flutter.embedding.android.FlutterActivity;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "samples.flutter.io/battery";
@@ -30,34 +31,39 @@ public class MainActivity extends FlutterActivity {
     private MapView mapView;
     private Disposable timerSubscription;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        GeneratedPluginRegistrant.registerWith(this);
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine);
+
         mapView = new MapView(MainActivity.this);
         mapView.onCreate(savedInstanceState);
         ViewRegistrant.registerWith(this, mapView);
 
-        new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler(
-                (call, result) -> {
-                    if (call.method.equals("getBatteryLevel")) {
-                        int batteryLevel = MainActivity.this.getBatteryLevel();
 
-                        if (batteryLevel != -1) {
-                            result.success(batteryLevel);
-                        } else {
-                            result.error("UNAVAILABLE", "Battery level not available.", null);
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
+                .setMethodCallHandler(
+                        (call, result) -> {
+                            if (call.method.equals("getBatteryLevel")) {
+                                int batteryLevel = MainActivity.this.getBatteryLevel();
+
+                                if (batteryLevel != -1) {
+                                    result.success(batteryLevel);
+                                } else {
+                                    result.error("UNAVAILABLE", "Battery level not available.", null);
+                                }
+                            } else if (call.method.equals("goAboutActivity")) {
+                                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                                MainActivity.this.startActivity(intent);
+                                result.success("success");
+                            } else {
+                                result.notImplemented();
+                            }
                         }
-                    } else if (call.method.equals("goAboutActivity")) {
-                        Intent intent = new Intent(MainActivity.this, AboutActivity.class);
-                        MainActivity.this.startActivity(intent);
-                        result.success("success");
-                    } else {
-                        result.notImplemented();
-                    }
-                });
+                );
 
-        new EventChannel(getFlutterView(), STREAM).setStreamHandler(
+
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), STREAM).setStreamHandler(
                 new EventChannel.StreamHandler() {
                     @Override
                     public void onListen(Object args, final EventChannel.EventSink events) {
